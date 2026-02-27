@@ -35,6 +35,14 @@ export namespace Login {
   export interface ReqLoginForm {
     phone: string;
     password: string;
+    rememberPwd: boolean;
+  }
+  export interface ReqRegisterForm {
+    phone: string;
+    password: string;
+    confirmPassword: string;
+    region: string[];
+    code: string;
   }
   export interface ResLogin {
     access_token: string;

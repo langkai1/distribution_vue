@@ -73,3 +73,22 @@ export const getUserRole = () => {
 export const uploadUserImport = (params: FormData) => {
   return http.post<Upload.ResFileUrl>(PORT1 + `/user/import`, params, { cancel: false });
 };
+// 获取用户个人信息
+export const getUserInfo = () => {
+  return http.get(PORT1 + `/me`);
+};
+// 用户生成邀请码
+export const generateInviteCode = () => {
+  return http.post(PORT1 + `/user/invite_code`);
+};
+
+// 更新用户个人信息
+export const updateUserInfo = (params: {
+  nickname: string;
+  avatar: string;
+  region_pca: string[];
+  region_code: string;
+  detailed_address: string;
+}) => {
+  return http.put(PORT1 + `/me`, params);
+};

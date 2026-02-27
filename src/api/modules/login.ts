@@ -9,7 +9,12 @@ import http from "@/api";
  */
 // 用户登录
 export const loginApi = (params: Login.ReqLoginForm) => {
-  return http.post<Login.ResLogin>(PORT1 + `/login`, params, { loading: false }); // 正常 post json 请求  ==>  application/json
+  return http.post<Login.ResLogin>(PORT1 + `/login`, params, { loading: false });
+};
+
+// 用户注册
+export const registerApi = (params: Login.ReqRegisterForm) => {
+  return http.post(PORT1 + `/register`, params, { loading: false });
 };
 
 // 获取菜单列表
