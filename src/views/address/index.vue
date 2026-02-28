@@ -3,8 +3,8 @@
     <div class="table-box">
       <ProTable
         ref="proTable"
-        title="参数详情列表"
-        row-key="paramsId"
+        title="地址列表"
+        row-key="id"
         :indent="20"
         :columns="columns"
         table-layout="auto"
@@ -13,11 +13,12 @@
       >
         <!-- 表格 header 按钮 -->
         <template #tableHeader>
-          <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增', { itemType: 'str' })"> 新增 </el-button>
+          <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增', {})"> 新增 </el-button>
         </template>
         <!-- 菜单操作 -->
         <template #operation="scope">
           <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
+          <el-button type="danger" link :icon="Delete" @click="deleteAddressFun(scope.row)">删除</el-button>
         </template>
       </ProTable>
       <RoleDrawer ref="drawerRef" />
@@ -27,17 +28,17 @@
 
 <script setup lang="tsx" name="productName">
 import lodash from "lodash";
-import { CirclePlus, EditPen } from "@element-plus/icons-vue";
+import { CirclePlus, Delete, EditPen } from "@element-plus/icons-vue";
 import ProTable from "@/components/ProTable/index.vue";
 import RoleDrawer from "./components/RoleDrawer.vue";
 import { ColumnProps } from "@/components/ProTable/interface";
-import { getSystemParamsList, addSystemParams, updateSystemParams } from "@/api/modules/system_params";
+import { getAddressList, addAddress, updateAddress, deleteAddress } from "@/api/modules/address";
 import { ref } from "vue";
-import { getSystemDataOps } from "@/api/modules/system_dict_data";
+import { useHandleData } from "@/hooks/useHandleData";
 const proTable = ref();
 const getTableList = (params: any) => {
   let newParams = JSON.parse(JSON.stringify(lodash.pickBy(params, lodash.identity)));
-  return getSystemParamsList(newParams);
+  return getAddressList(newParams);
 };
 const dataCallback = (data: any) => {
   return {
@@ -47,29 +48,37 @@ const dataCallback = (data: any) => {
     pageSize: data.page_size
   };
 };
+// 删除地址
+const deleteAddressFun = async (row: any) => {
+  await useHandleData(deleteAddress, { id: row.id }, "删除该地址");
+  proTable.value?.getTableList();
+};
 // 表格配置项
 const columns: ColumnProps[] = [
+  { prop: "receiver", align: "left", label: "收货人", search: { el: "input" }, showOverflowTooltip: false, width: 200 },
   {
-    prop: "paramsId",
-    label: "参数标号"
-  },
-  { prop: "title", align: "left", label: "参数名称", search: { el: "input" }, showOverflowTooltip: false, width: 200 },
-  { prop: "key", label: "参数键名", search: { el: "input" }, width: 200, showOverflowTooltip: false },
-  {
-    prop: "value",
-    label: "字典键值"
+    prop: "phone",
+    label: "手机号",
+    search: { el: "input" }
   },
   {
-    prop: "item_type",
-    label: "参数类型",
-    enum: () => getSystemDataOps({ dict_type: "sys_dict_value_type" }),
-    search: { el: "select" }
+    prop: "region_pca",
+    label: "所在区域"
   },
-  { prop: "remarks", label: "备注" },
-  { prop: "created_at", label: "创建时间" },
+  {
+    prop: "detailed_address",
+    label: "详细地址"
+  },
+  {
+    prop: "is_default",
+    label: "默认地址",
+    enum: [
+      { label: "是", value: true },
+      { label: "否", value: false }
+    ]
+  },
   { prop: "operation", label: "操作", width: 250, fixed: "right" }
 ];
-
 // 打开 drawer(新增、查看、编辑)
 const drawerRef = ref<any>();
 const openDrawer = (title: string, row: any) => {
@@ -77,7 +86,7 @@ const openDrawer = (title: string, row: any) => {
     title,
     isView: title === "查看",
     row: { ...row },
-    api: title === "新增" ? addSystemParams : title === "编辑" ? updateSystemParams : undefined,
+    api: title === "新增" ? addAddress : title === "编辑" ? updateAddress : undefined,
     getTableList: proTable.value?.getTableList
   };
   drawerRef.value?.acceptParams(params);

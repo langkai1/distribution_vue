@@ -100,3 +100,22 @@ export namespace User {
     children?: ResDepartment[];
   }
 }
+
+// 账号开通模块
+export namespace Account {
+  export interface ReqAccountActivate {
+    sn_code: string;
+    activate_code: string;
+    invite_code: string;
+  }
+  export interface ResAccountStatus {
+    id: string;
+    sn_code: string;
+    activate_code: string;
+    invite_code: string;
+    status: number;
+    reject_reason: string;
+    create_time: string;
+    update_time: string;
+  }
+}

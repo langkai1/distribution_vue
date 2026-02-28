@@ -1,4 +1,4 @@
-import { ResPage, Upload, User } from "@/api/interface/index";
+import { ResPage, Upload, User, Account } from "@/api/interface/index";
 import { PORT1 } from "@/api/config/servicePort";
 import http from "@/api";
 
@@ -91,4 +91,18 @@ export const updateUserInfo = (params: {
   detailed_address: string;
 }) => {
   return http.put(PORT1 + `/me`, params);
+};
+// 更新用户密码
+export const updateUserPassword = (params: { old_password: string; new_password: string }) => {
+  return http.put(PORT1 + `/user/password`, params);
+};
+
+// 账号开通 - 提交激活申请
+export const submitAccountActivate = (params: Account.ReqAccountActivate) => {
+  return http.post(PORT1 + `/account/activate`, params);
+};
+
+// 账号开通 - 获取审核状态
+export const getAccountStatus = () => {
+  return http.get<Account.ResAccountStatus>(PORT1 + `/account/status`);
 };

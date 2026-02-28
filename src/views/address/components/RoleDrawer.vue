@@ -9,35 +9,37 @@
       :model="drawerProps.row"
       :hide-required-asterisk="drawerProps.isView"
     >
-      <el-form-item label="字典标签" prop="label">
-        <el-input v-model="drawerProps.row!.label" placeholder="请填写字典标签" clearable />
+      <el-form-item label="收货人" prop="receiver">
+        <el-input v-model="drawerProps.row!.receiver" placeholder="请填写收货人" clearable />
       </el-form-item>
-      <el-form-item label="字典键值" prop="value">
-        <el-input v-model="drawerProps.row!.value" placeholder="请填写字典键值" clearable />
+      <el-form-item label="手机号" prop="phone">
+        <el-input v-model="drawerProps.row!.phone" placeholder="请填写手机号" clearable />
       </el-form-item>
-      <el-form-item label="字典排序" prop="order_num">
-        <el-input-number :controls="false" :min="0" v-model="drawerProps.row!.order_num" placeholder="请填写字典排序" clearable />
+      <el-form-item label="所在区域" prop="region_pca">
+        <el-cascader
+          v-model="drawerProps.row.region_pca"
+          :options="pcaTextArr as CascaderOption[]"
+          placeholder="请选择省/市/区"
+          filterable
+          clearable
+        />
       </el-form-item>
-      <el-form-item label="键值类型" prop="item_type">
-        <el-radio-group v-model="drawerProps.row!.item_type">
-          <el-radio value="str">字符串</el-radio>
-          <el-radio value="int">整数</el-radio>
-          <el-radio value="bool">布尔值</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-radio-group v-model="drawerProps.row!.status">
-          <el-radio :value="true">正常</el-radio>
-          <el-radio :value="false">停用</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="备注" prop="remarks">
+      <el-form-item label="详细地址" prop="detailed_address">
         <el-input
           type="textarea"
           :autosize="{ minRows: 2 }"
-          v-model="drawerProps.row!.remarks"
-          placeholder="请填写备注"
+          v-model="drawerProps.row!.detailed_address"
+          placeholder="请填写详细地址"
           clearable
+        />
+      </el-form-item>
+      <el-form-item label="默认地址" prop="is_default">
+        <el-switch
+          v-model="drawerProps.row!.is_default"
+          active-value="1"
+          inactive-value="0"
+          active-text="是"
+          inactive-text="否"
         />
       </el-form-item>
     </el-form>
@@ -50,14 +52,12 @@
 
 <script setup lang="ts" name="RoleDrawer">
 import { ref, reactive } from "vue";
-import { ElMessage, FormInstance } from "element-plus";
-
+import { CascaderOption, ElMessage, FormInstance } from "element-plus";
+import { pcaTextArr } from "element-china-area-data";
 const rules = reactive({
-  label: [{ required: true, message: "请填写字典标签" }],
-  value: [{ required: true, message: "请填写字典键值" }],
-  status: [{ required: true, message: "请选择状态" }],
-  itemType: [{ required: true, message: "请选择键值类型" }],
-  orderNum: [{ required: true, message: "请填写字典排序" }]
+  receiver: [{ required: true, message: "请填写收货人" }],
+  phone: [{ required: true, message: "请填写手机号" }],
+  region_pca: [{ required: true, message: "请选择所在区域" }]
 });
 
 interface DrawerProps {
@@ -77,6 +77,10 @@ const drawerProps = ref<DrawerProps>({
 // 接收父组件传过来的参数
 const acceptParams = (params: DrawerProps) => {
   drawerProps.value = params;
+  // 初始化表单数据
+  if (drawerProps.value.row.region_pca) {
+    drawerProps.value.row.region_pca = drawerProps.value.row.region_pca.split("-");
+  }
   drawerVisible.value = true;
 };
 // json2formdata
@@ -86,7 +90,9 @@ const handleSubmit = () => {
   ruleFormRef.value!.validate(async valid => {
     if (!valid) return;
     try {
-      await drawerProps.value.api!(drawerProps.value.row);
+      let params = JSON.parse(JSON.stringify(drawerProps.value.row));
+      params.region_pca = params.region_pca.join("-");
+      await drawerProps.value.api!(params);
       ElMessage.success({ message: `${drawerProps.value.title}成功！` });
       drawerProps.value.getTableList!();
       drawerVisible.value = false;

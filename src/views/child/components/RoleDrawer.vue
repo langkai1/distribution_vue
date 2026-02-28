@@ -9,27 +9,26 @@
       :model="drawerProps.row"
       :hide-required-asterisk="drawerProps.isView"
     >
-      <el-form-item label="字典标签" prop="label">
-        <el-input v-model="drawerProps.row!.label" placeholder="请填写字典标签" clearable />
+      <el-form-item label="名称" prop="name">
+        <el-input v-model="drawerProps.row!.name" placeholder="请填写名称" clearable />
       </el-form-item>
-      <el-form-item label="字典键值" prop="value">
-        <el-input v-model="drawerProps.row!.value" placeholder="请填写字典键值" clearable />
-      </el-form-item>
-      <el-form-item label="字典排序" prop="order_num">
-        <el-input-number :controls="false" :min="0" v-model="drawerProps.row!.order_num" placeholder="请填写字典排序" clearable />
-      </el-form-item>
-      <el-form-item label="键值类型" prop="item_type">
-        <el-radio-group v-model="drawerProps.row!.item_type">
-          <el-radio value="str">字符串</el-radio>
-          <el-radio value="int">整数</el-radio>
-          <el-radio value="bool">布尔值</el-radio>
+      <el-form-item label="性别" prop="gender">
+        <el-radio-group v-model="drawerProps.row!.gender">
+          <el-radio value="1">男</el-radio>
+          <el-radio value="2">女</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-radio-group v-model="drawerProps.row!.status">
-          <el-radio :value="true">正常</el-radio>
-          <el-radio :value="false">停用</el-radio>
-        </el-radio-group>
+      <el-form-item label="出生日期" prop="birthday">
+        <el-date-picker
+          v-model="drawerProps.row!.birthday"
+          type="date"
+          format="YYYY-MM-DD"
+          value-format="YYYY-MM-DD"
+          placeholder="请选择出生日期"
+        />
+      </el-form-item>
+      <el-form-item label="联系方式" prop="contact">
+        <el-input v-model="drawerProps.row!.contact" placeholder="请填写联系方式" clearable />
       </el-form-item>
       <el-form-item label="备注" prop="remarks">
         <el-input
@@ -53,11 +52,9 @@ import { ref, reactive } from "vue";
 import { ElMessage, FormInstance } from "element-plus";
 
 const rules = reactive({
-  label: [{ required: true, message: "请填写字典标签" }],
-  value: [{ required: true, message: "请填写字典键值" }],
-  status: [{ required: true, message: "请选择状态" }],
-  itemType: [{ required: true, message: "请选择键值类型" }],
-  orderNum: [{ required: true, message: "请填写字典排序" }]
+  name: [{ required: true, message: "请填写名称" }],
+  gender: [{ required: true, message: "请选择性别" }],
+  birthday: [{ required: true, message: "请选择出生日期" }]
 });
 
 interface DrawerProps {
@@ -77,6 +74,10 @@ const drawerProps = ref<DrawerProps>({
 // 接收父组件传过来的参数
 const acceptParams = (params: DrawerProps) => {
   drawerProps.value = params;
+  // 初始化表单数据
+  if (drawerProps.value.row.gender) {
+    drawerProps.value.row.gender = drawerProps.value.row.gender.toString();
+  }
   drawerVisible.value = true;
 };
 // json2formdata

@@ -57,6 +57,10 @@
           <el-empty v-else description="暂无二维码" :image-size="120"></el-empty>
         </div>
       </div>
+
+      <div class="info-section">
+        <ChangePassword />
+      </div>
     </div>
 
     <el-drawer v-model="drawerVisible" title="编辑个人信息" size="500px" :before-close="handleDrawerClose">
@@ -116,6 +120,7 @@ import { User, Edit, Promotion, Grid, Refresh, Download } from "@element-plus/ic
 import { codeToText, regionData } from "element-china-area-data";
 import UploadImg from "@/components/Upload/Img.vue";
 import { useUserStore } from "@/stores/modules/user";
+import ChangePassword from "./components/ChangePassword.vue";
 
 const defaultAvatar = "@/assets/images/avatar.gif";
 const userStore = useUserStore();

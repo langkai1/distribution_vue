@@ -18,8 +18,8 @@
       <el-form-item label="字典键值" prop="value">
         <el-input v-model="drawerProps.row!.value" placeholder="请填写字典键值" clearable />
       </el-form-item>
-      <el-form-item label="键值类型" prop="itemType">
-        <el-radio-group v-model="drawerProps.row!.itemType">
+      <el-form-item label="键值类型" prop="item_type">
+        <el-radio-group v-model="drawerProps.row!.item_type">
           <el-radio value="str">字符串</el-radio>
           <el-radio value="int">整数</el-radio>
           <el-radio value="bool">布尔值</el-radio>

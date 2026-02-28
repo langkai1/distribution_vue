@@ -71,7 +71,7 @@ const columns: ColumnProps[] = [
     prop: "value",
     label: "字典键值"
   },
-  { prop: "orderNum", label: "字典排序" },
+  { prop: "order_num", label: "字典排序" },
   {
     prop: "status",
     label: "状态",
