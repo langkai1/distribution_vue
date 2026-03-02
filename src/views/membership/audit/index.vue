@@ -6,7 +6,7 @@
       </div>
       <ProTable
         ref="proTable"
-        title="孩子列表"
+        title="审核列表"
         row-key="id"
         :indent="20"
         :init-param="Object.assign(initParam, selectFilterValues)"
