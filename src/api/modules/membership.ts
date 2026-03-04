@@ -20,3 +20,11 @@ export const openChannelPartner = (params: any) => {
 export const getChannelSet = () => {
   return http.get(PORT1 + `/system_params/channel_set`, {}, { loading: false });
 };
+// 获取保证金退还列表
+export const getReturnDepositList = (params: any) => {
+  return http.get(PORT1 + `/return_deposit/list`, params, { loading: false });
+};
+// 设置保证金退还审核状态
+export const setReturnDepositStatus = (params: any) => {
+  return http.post(PORT1 + `/return_deposit/set_status`, params, { loading: false });
+};

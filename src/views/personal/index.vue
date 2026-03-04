@@ -61,6 +61,67 @@
       <div class="info-section">
         <ChangePassword />
       </div>
+
+      <div v-if="user_info.is_channel" class="info-section">
+        <div class="section-title">
+          <el-icon><Wallet /></el-icon>
+          <span>保证金退款</span>
+        </div>
+        <div class="deposit-refund-wrapper">
+          <div class="refund-status-card">
+            <div class="status-header">
+              <span class="status-label">退款状态</span>
+              <el-tag :type="getStatusType(user_info.return_deposit_status)" size="large" effect="dark">
+                {{ getStatusText(user_info.return_deposit_status) }}
+              </el-tag>
+            </div>
+            <div class="status-info">
+              <div class="info-item">
+                <span class="info-label">可申请退款</span>
+                <el-tag :type="user_info.can_return_deposit ? 'success' : 'info'" size="small">
+                  {{ user_info.can_return_deposit ? "是" : "否" }}
+                </el-tag>
+              </div>
+              <div class="info-item">
+                <span class="info-label">已退款</span>
+                <el-tag :type="user_info.is_return_deposit ? 'success' : 'info'" size="small">
+                  {{ user_info.is_return_deposit ? "是" : "否" }}
+                </el-tag>
+              </div>
+              <div class="info-item">
+                <span class="info-label">已申请退款</span>
+                <el-tag :type="user_info.is_apply_return_deposit ? 'warning' : 'info'" size="small">
+                  {{ user_info.is_apply_return_deposit ? "是" : "否" }}
+                </el-tag>
+              </div>
+              <div class="info-item">
+                <span class="info-label">总出货量</span>
+                <span class="info-value">{{ user_info.total_order_num }}</span>
+              </div>
+            </div>
+            <div v-if="user_info.can_return_deposit && !user_info.is_return_deposit" class="refund-actions">
+              <el-button type="primary" :icon="DocumentAdd" :loading="applyRefundLoading" @click="handleApplyRefund">
+                申请退款
+              </el-button>
+            </div>
+          </div>
+
+          <div v-if="user_info.return_deposit_remarks || (user_info.files && user_info.files.length > 0)" class="refund-details">
+            <div v-if="user_info.return_deposit_remarks" class="detail-item">
+              <div class="detail-label">退款备注</div>
+              <div class="detail-content">{{ user_info.return_deposit_remarks }}</div>
+            </div>
+            <div v-if="user_info.files && user_info.files.length > 0" class="detail-item">
+              <div class="detail-label">附件</div>
+              <div class="detail-content">
+                <el-tag v-for="(file, index) in user_info.files" :key="index" class="file-tag" @click="viewFile(file)">
+                  {{ file.name }}
+                </el-tag>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <el-drawer v-model="drawerVisible" title="编辑个人信息" size="500px" :before-close="handleDrawerClose">
@@ -114,9 +175,9 @@
 
 <script setup lang="ts" name="home">
 import { onMounted, ref, reactive } from "vue";
-import { getUserInfo, generateInviteCode, updateUserInfo } from "@/api/modules/user";
+import { getUserInfo, generateInviteCode, updateUserInfo, applyRefundDeposit } from "@/api/modules/user";
 import { CascaderOption, ElMessage, type FormInstance, type FormRules } from "element-plus";
-import { User, Edit, Promotion, Grid, Refresh, Download } from "@element-plus/icons-vue";
+import { User, Edit, Promotion, Grid, Refresh, Download, Wallet, DocumentAdd } from "@element-plus/icons-vue";
 import { codeToText, regionData } from "element-china-area-data";
 import UploadImg from "@/components/Upload/Img.vue";
 import { useUserStore } from "@/stores/modules/user";
@@ -127,6 +188,7 @@ const userStore = useUserStore();
 const drawerVisible = ref(false);
 const saveLoading = ref(false);
 const editFormRef = ref<FormInstance>();
+const applyRefundLoading = ref(false);
 
 const user_info = ref<any>({
   id: "",
@@ -137,7 +199,15 @@ const user_info = ref<any>({
   qrcode_url: "",
   region_pca: "",
   region_code: "",
-  detailed_address: ""
+  detailed_address: "",
+  is_channel: false,
+  can_return_deposit: false,
+  total_order_num: 0,
+  is_return_deposit: false,
+  is_apply_return_deposit: false,
+  return_deposit_status: 0,
+  return_deposit_remarks: "",
+  files: []
 });
 
 const editForm = reactive({
@@ -168,6 +238,15 @@ const get_user_info = async () => {
   try {
     const { data }: any = await getUserInfo();
     user_info.value = data;
+    if (data.is_channel && data.is_validity) {
+      let a = codeToText[data.channel_region_code];
+      user_info.value.roles.push(`渠道合伙人(${a})(出货量${data.total_order_num})`);
+    } else if (data.is_channel && !data.is_validity) {
+      let a = codeToText[data.channel_region_code];
+      user_info.value.roles.push(`渠道合伙人(${a})(已过期)`);
+    } else if (data.level) {
+      user_info.value.roles.push(`${data.level}(${data.total_order_num})`);
+    }
   } catch (error) {
     ElMessage.error("获取用户信息失败");
   }
@@ -256,6 +335,45 @@ const downloadQrcode = () => {
   link.download = "邀请二维码.png";
   link.click();
   ElMessage.success("二维码下载成功");
+};
+
+const getStatusType = (status: number) => {
+  const statusMap: Record<number, any> = {
+    0: "info",
+    1: "warning",
+    2: "danger",
+    3: "success",
+    4: "success"
+  };
+  return statusMap[status] || "info";
+};
+
+const getStatusText = (status: number) => {
+  const statusMap: Record<number, string> = {
+    0: "未申请",
+    1: "待审核",
+    2: "已拒绝",
+    3: "已通过",
+    4: "已退款"
+  };
+  return statusMap[status] || "未知";
+};
+
+const handleApplyRefund = async () => {
+  applyRefundLoading.value = true;
+  try {
+    await applyRefundDeposit();
+    ElMessage.success("退款申请提交成功");
+    await get_user_info();
+  } catch (error) {
+  } finally {
+    applyRefundLoading.value = false;
+  }
+};
+
+const viewFile = (file: any) => {
+  const url = `/api/${file.url}`;
+  window.open(url, "_blank");
 };
 </script>
 
@@ -507,6 +625,106 @@ const downloadQrcode = () => {
   padding-top: 20px;
   border-top: 1px solid #ebeef5;
 }
+.deposit-refund-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.refund-status-card {
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 8%);
+  transition: transform 0.3s ease;
+  &:hover {
+    transform: scale(1.01);
+  }
+}
+.status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgb(0 0 0 / 10%);
+}
+.status-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+}
+.status-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.info-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 5%);
+  transition: all 0.3s ease;
+  &:hover {
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+    transform: translateY(-2px);
+  }
+}
+.info-label {
+  font-size: 14px;
+  color: #666666;
+}
+.info-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #667eea;
+}
+.refund-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+}
+.refund-details {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  border-radius: 12px;
+}
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.detail-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+}
+.detail-content {
+  padding: 12px 15px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #666666;
+  word-break: break-word;
+  background: white;
+  border-radius: 8px;
+}
+.file-tag {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  &:hover {
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+    transform: translateY(-2px);
+  }
+}
 
 @media screen and (width <= 768px) {
   .personal-container {
@@ -556,6 +774,20 @@ const downloadQrcode = () => {
   .avatar-preview {
     width: 100px;
     height: 100px;
+  }
+  .status-info {
+    grid-template-columns: 1fr;
+  }
+  .refund-actions {
+    flex-direction: column;
+    width: 100%;
+    .el-button {
+      width: 100%;
+    }
+  }
+  .file-tag {
+    width: 100%;
+    margin-right: 0;
   }
 }
 </style>

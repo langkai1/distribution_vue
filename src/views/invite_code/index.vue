@@ -4,7 +4,7 @@
       <div class="header-icon">
         <el-icon :size="60" color="#667eea"><Key /></el-icon>
       </div>
-      <h2 class="header-title">账号开通</h2>
+      <h2 class="header-title">星级合伙人账号开通</h2>
       <p class="header-desc">填写以下信息提交账号开通申请，等待管理员审核</p>
     </div>
 

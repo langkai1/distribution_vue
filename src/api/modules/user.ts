@@ -106,3 +106,7 @@ export const submitAccountActivate = (params: Account.ReqAccountActivate) => {
 export const getAccountStatus = () => {
   return http.get<Account.ResAccountStatus>(PORT1 + `/account/status`);
 };
+// 渠道合伙人 - 申请退还保证金
+export const applyRefundDeposit = () => {
+  return http.post(PORT1 + `/user/return_deposit`, {});
+};

@@ -16,3 +16,7 @@ export const updateAddress = (params: any) => {
 export const deleteAddress = (params: any) => {
   return http.delete(PORT1 + `/address/delete`, params, { loading: false });
 };
+// 获取用户自己的地址列表
+export const getUserAddressOps = (params: any) => {
+  return http.get(PORT1 + `/address/user/ops`, params, { loading: false });
+};
