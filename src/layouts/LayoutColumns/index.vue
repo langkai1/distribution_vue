@@ -3,7 +3,7 @@
   <el-container class="layout">
     <div class="aside-split">
       <div class="logo flx-center">
-        <img class="logo-img" src="@/assets/images/logo1.svg" alt="logo" />
+        <img class="logo-img" src="@/assets/images/logo2.svg" alt="logo" />
       </div>
       <el-scrollbar>
         <div class="split-list">
@@ -94,10 +94,11 @@ const changeSubMenu = (item: Menu.MenuOptions) => {
   splitActive.value = item.path;
   if (item.children?.length) return (subMenuList.value = item.children);
   subMenuList.value = [];
+  if (item.meta.isLink) return window.open(item.meta.isLink, "_blank");
   router.push(item.path);
 };
 </script>
 
 <style scoped lang="scss">
-@import "./index.scss";
+@import "./index";
 </style>

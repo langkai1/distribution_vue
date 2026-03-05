@@ -4,7 +4,7 @@
     <el-header>
       <div class="header-lf mask-image">
         <div class="logo flx-center">
-          <img class="logo-img" src="@/assets/images/logo1.svg" alt="logo" />
+          <img class="logo-img" src="@/assets/images/logo2.svg" alt="logo" />
           <span class="logo-text">{{ title }}</span>
         </div>
         <ToolBarLeft />
@@ -58,5 +58,5 @@ const activeMenu = computed(() => (route.meta.activeMenu ? route.meta.activeMenu
 </script>
 
 <style scoped lang="scss">
-@import "./index.scss";
+@import "./index";
 </style>

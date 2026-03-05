@@ -110,3 +110,11 @@ export const getAccountStatus = () => {
 export const applyRefundDeposit = () => {
   return http.post(PORT1 + `/user/return_deposit`, {});
 };
+//  获取自己的财务情况
+export const getMyFinancial = () => {
+  return http.get(PORT1 + `/my_financial`);
+};
+//  获取自己的财务详情
+export const getMyFinancialDetail = (params: any) => {
+  return http.get(PORT1 + `/user_financial_list`, params);
+};

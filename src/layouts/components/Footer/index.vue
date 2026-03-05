@@ -1,6 +1,6 @@
 <template>
   <div class="footer flx-center">
-    <a href="https://github.com/HalseySpicy" target="_blank"> 2026 © Jzdz Technology. </a>
+    <a href="" target="_blank"> 2026 © Book Management System. </a>
   </div>
 </template>
 
