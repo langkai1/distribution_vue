@@ -108,7 +108,7 @@ const login = (formEl: FormInstance | undefined) => {
       router.push(HOME_URL);
       ElNotification({
         title: getTimeState(),
-        message: "欢迎登录 智游乔家管理系统",
+        message: "欢迎登录 图书管理系统",
         type: "success",
         duration: 3000
       });

@@ -98,7 +98,7 @@ props.editorConfig.MENU_CONF!["uploadImage"] = {
     formData.append("file", file);
     try {
       const { data } = await uploadImg(formData);
-      insertFn(data.fileUrl);
+      insertFn("/api/" + data.fileUrl);
     } catch (error) {
       console.log(error);
     }
@@ -124,7 +124,7 @@ props.editorConfig.MENU_CONF!["uploadVideo"] = {
     formData.append("file", file);
     try {
       const { data } = await uploadVideo(formData);
-      insertFn(data.fileUrl);
+      insertFn("/api/" + data.fileUrl);
     } catch (error) {
       console.log(error);
     }
@@ -154,5 +154,5 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-@import "./index.scss";
+@import "./index";
 </style>
