@@ -7,8 +7,8 @@
       </div>
       <div class="login-form">
         <div class="login-logo">
-          <img class="login-icon" src="@/assets/images/logo2.svg" alt="" />
-          <h2 class="logo-text">图书管理系统</h2>
+          <img class="login-icon" src="@/assets/images/h.png" alt="" />
+          <h2 class="logo-text">会员服务中心</h2>
         </div>
         <LoginForm v-if="currentForm === 'login'" key="login" @switch-to-register="switchToRegister" />
         <RegisterForm v-else key="register" @switch-to-login="switchToLogin" />
