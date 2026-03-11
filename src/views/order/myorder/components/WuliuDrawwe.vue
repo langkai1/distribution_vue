@@ -57,6 +57,16 @@ const drawerProps = ref<DrawerProps>({
 // 接收父组件传过来的参数
 const acceptParams = (params: DrawerProps) => {
   drawerProps.value = params;
+  if (drawerProps.value.row!.addressList.length > 0 && !drawerProps.value.row!.sned_no) {
+    let defaultAddress = drawerProps.value.row!.addressList.find(item => item.is_default === true);
+    if (defaultAddress) {
+      drawerProps.value.row!.address_id = defaultAddress.value;
+      drawerProps.value.row!.region_pca = defaultAddress.region_pca;
+      drawerProps.value.row!.receiver = defaultAddress.receiver;
+      drawerProps.value.row!.phone = defaultAddress.phone;
+      drawerProps.value.row!.detailed_address = defaultAddress.detailed_address;
+    }
+  }
   drawerVisible.value = true;
 };
 // json2formdata

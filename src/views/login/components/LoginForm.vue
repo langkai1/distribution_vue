@@ -108,7 +108,7 @@ const login = (formEl: FormInstance | undefined) => {
       router.push(HOME_URL);
       ElNotification({
         title: getTimeState(),
-        message: "欢迎登录 图书管理系统",
+        message: "欢迎登录 会员服务中心",
         type: "success",
         duration: 3000
       });

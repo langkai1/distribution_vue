@@ -21,7 +21,15 @@
           <el-button v-if="Number(scope.row.actual_pay_amount) > 0" type="primary" link @click="paySubmit(scope.row)">
             付款凭证
           </el-button>
-          <el-button v-if="scope.row.order_status === 'receive_method'" type="primary" link @click="handleSubmit(scope.row)">
+          <el-button
+            v-if="
+              scope.row.receive_method === 1 &&
+              (scope.row.order_status === 'pay_finished' || scope.row.order_status === 'completed')
+            "
+            type="primary"
+            link
+            @click="handleSubmit(scope.row)"
+          >
             发货物流
           </el-button>
           <el-button
@@ -192,7 +200,7 @@ const columns: ColumnProps[] = [
   {
     prop: "operation",
     label: "操作",
-    width: 180
+    width: 280
   }
 ];
 </script>

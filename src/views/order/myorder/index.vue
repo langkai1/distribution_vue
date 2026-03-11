@@ -24,10 +24,22 @@
           <el-button v-if="Number(scope.row.actual_pay_amount) > 0" type="primary" link @click="paySubmit(scope.row)">
             付款凭证
           </el-button>
+          <el-button
+            v-if="
+              scope.row.receive_method === 1 &&
+              (scope.row.order_status === 'pay_finished' || scope.row.order_status === 'completed')
+            "
+            type="primary"
+            link
+            @click="handleSubmit1(scope.row)"
+          >
+            发货物流
+          </el-button>
         </template>
       </ProTable>
       <RoleDrawer ref="roleDrawer" />
       <PayDrawer ref="payDrawer" />
+      <WuliuDrawer ref="wuliuDrawer" />
     </div>
   </div>
 </template>
@@ -37,9 +49,17 @@ import lodash from "lodash";
 import ProTable from "@/components/ProTable/index.vue";
 import { ColumnProps } from "@/components/ProTable/interface";
 import SelectFilter from "@/components/SelectFilter/index.vue";
-import { getMyOrderList, addOrder, getUserAvailablePoints, addOrderPayFile, getOrderPayFile } from "@/api/modules/order";
+import {
+  getMyOrderList,
+  addOrder,
+  getUserAvailablePoints,
+  addOrderPayFile,
+  getOrderPayFile,
+  getOrderDeliveryInfo
+} from "@/api/modules/order";
 import RoleDrawer from "./components/RoleDrawer.vue";
 import PayDrawer from "./components/PayDrawer.vue";
+import WuliuDrawer from "./components/WuliuDrawwe.vue";
 import { reactive, ref } from "vue";
 import { getUserAddressOps } from "@/api/modules/address";
 const proTable = ref();
@@ -56,6 +76,7 @@ const dataCallback = (data: any) => {
   };
 };
 const roleDrawer = ref();
+const wuliuDrawer = ref();
 const handleSubmit = async () => {
   const { data: pointsData }: any = await getUserAvailablePoints({});
   const { data: addressData }: any = await getUserAddressOps({});
@@ -87,6 +108,17 @@ const paySubmit = async (row: any) => {
   });
 };
 const selectFilterValues = ref({ order_status: "" });
+const handleSubmit1 = async (row: any) => {
+  const { data }: any = await getOrderDeliveryInfo({ id: row.id });
+  wuliuDrawer.value.acceptParams({
+    title: "报备订单",
+    isView: true,
+    row: {
+      id: row.id,
+      ...data
+    }
+  });
+};
 const initParam = reactive({});
 const selectFilterData = reactive([
   {
