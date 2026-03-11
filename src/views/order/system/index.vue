@@ -81,7 +81,7 @@ const roleDrawer = ref();
 const handleSubmit = async (row: any) => {
   const { data }: any = await getOrderDeliveryInfo({ id: row.id });
   roleDrawer.value.acceptParams({
-    title: "报备订单",
+    title: "发货物流",
     row: {
       id: row.id,
       ...data

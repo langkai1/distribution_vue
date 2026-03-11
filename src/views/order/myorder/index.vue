@@ -111,7 +111,7 @@ const selectFilterValues = ref({ order_status: "" });
 const handleSubmit1 = async (row: any) => {
   const { data }: any = await getOrderDeliveryInfo({ id: row.id });
   wuliuDrawer.value.acceptParams({
-    title: "报备订单",
+    title: "发货物流",
     isView: true,
     row: {
       id: row.id,
